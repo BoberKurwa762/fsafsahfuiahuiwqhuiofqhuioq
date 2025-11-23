@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>System Error</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+body.fake-fullscreen { border: none; transform: scale(1); }
+body.fake-windowed { border: 20px solid white; transform: scale(0.93); }
+
+#start {
+  position: fixed; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  color: red; font-size: 30px; background: black;
+  z-index: 20; user-select: none;
+}
+
+#flash {
+  position: fixed; inset: 0; background: black;
+  display: none; justify-content: center; align-items: center;
+  color: red; font-size: 38px; text-align: center;
+  z-index: 5;
+}
+
+#scream {
+  position: fixed; inset: 0; display: none;
+  background-size: cover; background-position: center;
+  z-index: 10;
+}
+
+@keyframes shake {
+  0% { transform: translate(0,0); }
+  20% { transform: translate(-20px,10px); }
+  40% { transform: translate(15px,-15px); }
+  60% { transform: translate(-10px,-20px); }
+  80% { transform: translate(20px,10px); }
+  100% { transform: translate(0,0); }
+}
+</style>
+</head>
+<body>
+
+<div id="start">CLICK TO FIX SYSTEM ERROR</div>
+
+<div id="flash">CRITICAL SYSTEM FAILURE<br>ESCAPE DISABLED</div>
+
+<div id="scream"></div>
+
+<audio id="snd-main" src="https://cdn.pixabay.com/download/audio/2023/04/26/audio_f0f16fc5f9.mp3?filename=crazy-distorted-screaming-sound-39350.mp3"></audio>
+
+<script>
+let started = false;
+
+document.body.addEventListener("click", ()=>{
+  if (started) return;
+  started = true;
+
+  document.body.style.cursor = "none";
+
+  document.getElementById("start").style.display = "none";
+  let f = document.getElementById("flash");
+  let s = document.getElementById("scream");
+  let sndMain = document.getElementById("snd-main");
+
+  f.style.display = "flex";
+
+  let fsToggle = setInterval(()=>{
+    if (document.body.classList.contains("fake-fullscreen")) {
+      document.body.classList.remove("fake-fullscreen");
+      document.body.classList.add("fake-windowed");
+    } else {
+      document.body.classList.remove("fake-windowed");
+      document.body.classList.add("fake-fullscreen");
+    }
+  },500);
+
+  let flashInterval = setInterval(()=>{
+    f.style.background = f.style.background === "black" ? "red" : "black";
+  },150);
+
+  setInterval(()=>{
+    f.style.animation = "shake .2s";
+    setTimeout(()=>{ f.style.animation = ""; },200);
+  },300);
+
+  setTimeout(()=>{
+    clearInterval(flashInterval);
+
+    sndMain.volume = 1;
+    sndMain.play();
+
+    s.style.backgroundImage = "url('https://preview.redd.it/midwife-analog-horror-tw-horror-blood-v0-56gm0okxecgc1.png?width=640&crop=smart&auto=webp&s=61e2cc82f5d8def9b144347ef4aab45560ef0162')";
+    s.style.display = "block";
+    f.style.display = "none";
+
+    clearInterval(fsToggle);
+    document.body.classList.remove("fake-windowed","fake-fullscreen");
+
+    let faces = [
+      "https://preview.redd.it/midwife-analog-horror-tw-horror-blood-v0-56gm0okxecgc1.png?width=640&crop=smart&auto=webp&s=61e2cc82f5d8def9b144347ef4aab45560ef0162"
+    ];
+
+    let faceDiv = document.createElement("div");
+    faceDiv.style.position = "fixed";
+    faceDiv.style.inset = "0";
+    faceDiv.style.zIndex = "50";
+    faceDiv.style.backgroundSize = "cover";
+    faceDiv.style.backgroundPosition = "center";
+    faceDiv.style.display = "none";
+    document.body.appendChild(faceDiv);
+
+    function flashFace() {
+      faceDiv.style.backgroundImage = "url('" + faces[0] + "')";
+      faceDiv.style.display = "block";
+      setTimeout(()=>{ faceDiv.style.display = "none"; },80 + Math.random()*80);
+    }
+
+    let faceSpam = setInterval(flashFace,120);
+
+    // background loops
+    let whisper = new Audio("https://cdn.pixabay.com/download/audio/2018/04/07/audio_37f1dfbec2.mp3?filename=whispers-30557.mp3");
+    whisper.volume = 0.4;
+    whisper.loop = true;
+
+    let loopScream = new Audio("https://cdn.pixabay.com/download/audio/2023/04/26/audio_f0f16fc5f9.mp3?filename=crazy-distorted-screaming-sound-39350.mp3");
+    loopScream.volume = 0.15;
+    loopScream.loop = true;
+
+    let musicBox = new Audio("https://cdn.pixabay.com/download/audio/2023/11/12/audio_68a7942b31.mp3?filename=scary-music-box-untuned-427401.mp3");
+    musicBox.volume = 0.35;
+    musicBox.loop = true;
+
+    whisper.play();
+    loopScream.play();
+    musicBox.play();
+
+    setTimeout(()=>{
+      clearInterval(faceSpam);
+    },10000);
+
+  },2500);
+});
+
+window.addEventListener("keydown", e=>{
+  if(e.key === "Escape") e.preventDefault();
+});
+
+// leave confirm + reload trap
+window.onbeforeunload = function(e) {
+  e.preventDefault();
+  e.returnValue = "Do you want to leave?";
+};
+
+window.addEventListener("unload", function(){
+  window.location.href = window.location.href;
+});
+</script>
+
+</body>
+</html>
